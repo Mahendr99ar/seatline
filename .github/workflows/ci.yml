@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-retries 10
+      rabbitmq:
+        image: rabbitmq:3.13
+        ports: ["5672:5672"]
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping" --health-interval 10s --health-retries 10
+    env:
+      PGPASSWORD: postgres
+      TEST_USERS_DATABASE_URL: postgres://postgres:postgres@localhost/seatline_test_users
+      TEST_FLIGHTS_DATABASE_URL: postgres://postgres:postgres@localhost/seatline_test_flights
+      TEST_BOOKINGS_DATABASE_URL: postgres://postgres:postgres@localhost/seatline_test_bookings
+      TEST_NOTIFICATIONS_DATABASE_URL: postgres://postgres:postgres@localhost/seatline_test_notifications
+      AMQP_URL: amqp://guest:guest@localhost
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Test databases
+        run: |
+          for db in users flights bookings notifications; do
+            psql -h localhost -U postgres -c "CREATE DATABASE seatline_test_$db"
+          done
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t seatline .

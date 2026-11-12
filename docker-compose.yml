@@ -1,0 +1,81 @@
+# docker compose up -d --build
+# docker compose run --rm gateway node dist/cli.js seed 14
+# docker compose run --rm gateway node dist/cli.js create-admin you@example.com "Your Name"
+
+x-service: &service
+  build: .
+  restart: unless-stopped
+  env_file: .env
+  environment: &env
+    USERS_DATABASE_URL: postgres://seatline:${POSTGRES_PASSWORD}@db/seatline_users
+    FLIGHTS_DATABASE_URL: postgres://seatline:${POSTGRES_PASSWORD}@db/seatline_flights
+    BOOKINGS_DATABASE_URL: postgres://seatline:${POSTGRES_PASSWORD}@db/seatline_bookings
+    NOTIFICATIONS_DATABASE_URL: postgres://seatline:${POSTGRES_PASSWORD}@db/seatline_notifications
+    AMQP_URL: amqp://seatline:${RABBITMQ_PASSWORD}@mq
+    FLIGHTS_URL: http://flights:8081
+    BOOKINGS_URL: http://bookings:8082
+    NOTIFICATIONS_URL: http://notifications:8083
+  depends_on:
+    db:
+      condition: service_healthy
+    mq:
+      condition: service_healthy
+  mem_limit: 192m
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: seatline
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "seatline"]
+      interval: 5s
+      retries: 20
+    mem_limit: 384m
+
+  mq:
+    image: rabbitmq:3.13-alpine
+    restart: unless-stopped
+    hostname: mq
+    environment:
+      RABBITMQ_DEFAULT_USER: seatline
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - mqdata:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 20
+    mem_limit: 512m
+
+  flights:
+    <<: *service
+    command: ["node", "dist/flights/main.js"]
+
+  bookings:
+    <<: *service
+    command: ["node", "dist/bookings/main.js"]
+
+  notifications:
+    <<: *service
+    command: ["node", "dist/notifications/main.js"]
+
+  gateway:
+    <<: *service
+    command: ["node", "dist/gateway/main.js"]
+    environment:
+      <<: *env
+      TRUST_PROXY: "true"
+    # Only reachable from this machine. Caddy in front of it handles HTTPS.
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  pgdata:
+  mqdata:
