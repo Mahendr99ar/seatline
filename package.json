@@ -1,0 +1,38 @@
+{
+  "name": "seatline",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test --test-concurrency=1 'test/**/*.test.ts'",
+    "dev:gateway": "tsx src/gateway/main.ts",
+    "dev:flights": "tsx src/flights/main.ts",
+    "dev:bookings": "tsx src/bookings/main.ts",
+    "dev:notifications": "tsx src/notifications/main.ts",
+    "seed": "tsx src/cli.ts seed",
+    "create-admin": "tsx src/cli.ts create-admin"
+  },
+  "dependencies": {
+    "@fastify/http-proxy": "^11.6.6",
+    "@fastify/static": "^8.3.0",
+    "amqplib": "^2.3.1",
+    "bcryptjs": "^3.0.3",
+    "fastify": "^5.12.8",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^10.5.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.6",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
