@@ -1,0 +1,152 @@
+:root {
+  --ground: #eef2ef;
+  --card: #ffffff;
+  --ink: #14213d;
+  --muted: #5b6577;
+  --line: #d3dad5;
+  --go: #0b6e69;
+  --go-dark: #08524e;
+  --hold: #f2c230;
+  --stop: #b3261e;
+  --done: #2f6f2f;
+  --radius: 10px;
+  font-family: "Archivo", system-ui, sans-serif;
+  font-variation-settings: "wdth" 100;
+  color: var(--ink);
+  background: var(--ground);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.5; }
+a { color: var(--go); }
+:focus-visible { outline: 3px solid var(--hold); outline-offset: 2px; }
+main:focus { outline: none; }
+
+h1, h2, .brand, .time {
+  font-stretch: 125%;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: -0.01em;
+}
+h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 0.25rem; font-weight: 800; }
+h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; font-weight: 700; }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+
+.bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem clamp(1rem, 4vw, 3rem);
+  background: var(--ink); color: #fff;
+}
+.brand { color: #fff; text-decoration: none; font-weight: 800; font-size: 1.3rem; }
+.bar nav { display: flex; gap: 1.25rem; align-items: center; }
+.bar nav a, .bar nav button { color: #dfe6e2; text-decoration: none; background: none; border: 0; font: inherit; cursor: pointer; padding: 0; }
+.bar nav a:hover, .bar nav button:hover { color: #fff; }
+
+main { max-width: 980px; margin: 0 auto; padding: 2rem clamp(1rem, 4vw, 3rem) 4rem; }
+
+label { display: grid; gap: 0.3rem; font-size: 0.9rem; color: var(--muted); }
+input, select {
+  font: inherit; color: var(--ink);
+  padding: 0.6rem 0.7rem; border: 1px solid var(--line); border-radius: 8px; background: #fff;
+}
+button.primary, button.plain, button.danger {
+  font: inherit; font-weight: 600; cursor: pointer;
+  padding: 0.65rem 1.1rem; border-radius: 8px; border: 1px solid transparent;
+}
+button.primary { background: var(--go); color: #fff; }
+button.primary:hover { background: var(--go-dark); }
+button.plain { background: #fff; border-color: var(--line); color: var(--ink); }
+button.danger { background: #fff; border-color: var(--stop); color: var(--stop); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.search {
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end;
+  margin: 1.5rem 0 2rem;
+}
+@media (max-width: 700px) { .search { grid-template-columns: 1fr 1fr; } }
+
+.notice { padding: 0.75rem 1rem; border-radius: 8px; background: #fbe9e7; color: var(--stop); margin: 1rem 0; }
+.notice.ok { background: #e3f1e3; color: var(--done); }
+
+/* Results: departure and arrival read like a timetable line. */
+.flights { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.flight {
+  display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.25rem; text-decoration: none; color: inherit;
+}
+.flight:hover { border-color: var(--go); }
+.leg { display: flex; align-items: center; gap: 1rem; }
+.time { font-size: 1.5rem; font-weight: 700; }
+.leg .line { flex: 1; min-width: 3rem; border-top: 2px dotted var(--line); position: relative; }
+.leg .dur { font-size: 0.8rem; color: var(--muted); text-align: center; }
+.price { text-align: right; }
+.price strong { display: block; font-size: 1.25rem; }
+
+/* Seat map: a fuselage, nose up, aisle between C and D. */
+.cabin-layout { display: grid; grid-template-columns: minmax(0, 340px) 1fr; gap: 2rem; align-items: start; }
+@media (max-width: 760px) { .cabin-layout { grid-template-columns: 1fr; } }
+.fuselage {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 140px 140px 28px 28px; padding: 5rem 1.25rem 1.5rem;
+}
+.row { display: grid; grid-template-columns: repeat(3, 1fr) 1.6rem repeat(3, 1fr); gap: 0.35rem; margin-bottom: 0.35rem; }
+.row .rowno { text-align: center; font-size: 0.75rem; color: var(--muted); align-self: center; }
+.row.business .seat:not(:disabled):not([aria-pressed="true"]) { background: #e6f2f0; }
+.row.business + .row:not(.business) { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--line); }
+.seat {
+  aspect-ratio: 1; border-radius: 6px 6px 3px 3px; border: 1px solid var(--go);
+  background: #fff; color: var(--go); font: inherit; font-size: 0.7rem; font-weight: 600; cursor: pointer; padding: 0;
+}
+.row.business .seat { border-radius: 9px 9px 4px 4px; }
+.seat:hover:not(:disabled) { background: #dff0ee; }
+.seat[aria-pressed="true"] { background: var(--hold); border-color: #b48c10; color: var(--ink); }
+.seat:disabled { background: #e2e6e4; border-color: #e2e6e4; color: #a3aba7; cursor: not-allowed; }
+.legend { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0 1rem; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 3px; margin-right: 0.35rem; vertical-align: -0.1rem; border: 1px solid var(--go); }
+.legend .taken::before { background: #e2e6e4; border-color: #e2e6e4; }
+.legend .picked::before { background: var(--hold); border-color: #b48c10; }
+
+.passengers { display: grid; gap: 0.75rem; }
+.passenger { display: grid; grid-template-columns: 3.5rem 1fr 5rem; gap: 0.6rem; align-items: end; }
+.passenger .tag { font-weight: 700; padding-bottom: 0.6rem; }
+.total { display: flex; justify-content: space-between; align-items: baseline; margin: 1.25rem 0; font-size: 1.1rem; }
+
+/* Booking: a ticket with a tear-off stub. */
+.ticket {
+  display: grid; grid-template-columns: 1fr 220px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden;
+}
+@media (max-width: 700px) { .ticket { grid-template-columns: 1fr; } }
+.ticket .main { padding: 1.5rem; }
+.ticket .stub { padding: 1.5rem; border-left: 2px dashed var(--line); background: #f7f9f8; }
+@media (max-width: 700px) { .ticket .stub { border-left: 0; border-top: 2px dashed var(--line); } }
+.route { display: flex; gap: 1.5rem; align-items: baseline; flex-wrap: wrap; }
+.route .code { font-size: 2.6rem; font-weight: 800; font-stretch: 125%; font-variation-settings: "wdth" 125; line-height: 1; }
+.status { display: inline-block; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.85rem; background: #e2e6e4; }
+.status.CONFIRMED { background: #dcefdc; color: var(--done); }
+.status.HELD, .status.PAYING { background: #fbefc4; color: #6b5300; }
+.status.PAYMENT_FAILED, .status.FAILED, .status.EXPIRED, .status.CANCELLED, .status.CANCELLED_BY_AIRLINE { background: #f6dedc; color: var(--stop); }
+.countdown { font-size: 2.2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pax { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.pax th, .pax td { text-align: left; padding: 0.45rem 0; border-bottom: 1px solid var(--line); }
+.pax th { font-weight: 500; color: var(--muted); font-size: 0.85rem; }
+.actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+.history { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--line); }
+.history li { padding: 0 0 0.8rem 1rem; position: relative; }
+.history li::before { content: ""; position: absolute; left: -6px; top: 0.45rem; width: 10px; height: 10px; border-radius: 50%; background: var(--go); }
+.history time { color: var(--muted); font-size: 0.85rem; margin-left: 0.5rem; }
+
+.trips { display: grid; gap: 0.6rem; list-style: none; padding: 0; }
+.trip { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; color: inherit; align-items: center; }
+.trip:hover { border-color: var(--go); }
+
+.auth { max-width: 380px; display: grid; gap: 0.9rem; }
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; align-items: end; }
+.mail { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 0.5rem; }
+.mail pre { white-space: pre-wrap; font: inherit; color: var(--muted); margin: 0.4rem 0 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .seat { transition: background-color 120ms; }
+}
